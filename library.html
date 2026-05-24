@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library - Seyraphine's AU Archive</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Playfair Display', 'serif'] }, colors: { paper: '#faf9f6', ink: '#1c1c1c', accent: '#ea580c' } } } }
+    </script>
+</head>
+<body class="bg-paper text-ink font-sans min-h-screen p-8">
+    
+    <div class="max-w-4xl mx-auto">
+        <a href="/" class="text-sm text-gray-500 hover:text-ink mb-8 inline-block">&larr; Back to Home</a>
+        <h1 class="text-4xl font-serif font-bold mb-8">Story Library</h1>
+        
+        <div id="story-list" class="grid gap-6 md:grid-cols-2">
+            <p class="text-gray-500 animate-pulse">Loading stories...</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
+    <script>
+        async function loadLibrary() {
+            try {
+                const configRes = await fetch('/.netlify/functions/get-config');
+                const keys = await configRes.json();
+                const supabase = window.supabase.createClient(keys.supabaseUrl, keys.supabaseKey);
+
+                const { data, error } = await supabase
+                    .from('stories')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                const listContainer = document.getElementById('story-list');
+                listContainer.innerHTML = '';
+
+                if (error || data.length === 0) {
+                    listContainer.innerHTML = '<p class="text-gray-500">Belum ada cerita yang di-publish.</p>';
+                    return;
+                }
+
+                data.forEach(story => {
+                    const badge = story.is_paid 
+                        ? '<span class="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-full ml-2">Paid</span>' 
+                        : '<span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full ml-2">Free</span>';
+
+                    const card = `
+                        <a href="/story/${story.slug}" class="block p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-100">
+                            <h2 class="text-xl font-serif font-bold mb-2">${story.title} ${badge}</h2>
+                            <p class="text-sm text-gray-600 line-clamp-3">${story.synopsis}</p>
+                        </a>
+                    `;
+                    listContainer.innerHTML += card;
+                });
+
+            } catch (err) {
+                document.getElementById('story-list').innerHTML = '<p class="text-red-500">Gagal memuat sistem. Cek koneksi server.</p>';
+            }
+        }
+
+        loadLibrary();
+    </script>
+</body>
+</html>
