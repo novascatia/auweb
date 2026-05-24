@@ -3,18 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seyraphine's AU</title>
+    <title>Seyraphine's AU Archive</title>
     
-    <!-- Tailwind CSS (CDN untuk kemudahan tanpa install) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts untuk estetika "Novel" dan "UI Modern" -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     
     <script>
-        // Kustomisasi warna Tailwind
         tailwind.config = {
             theme: {
                 extend: {
@@ -25,9 +21,8 @@
                     colors: {
                         paper: '#faf9f6',
                         ink: '#1c1c1c',
-                        accent: '#ea580c' // Warna orange khas ala platform baca
+                        accent: '#ea580c'
                     },
-                    // Definisi animasi kustom
                     keyframes: {
                         fadeInUp: {
                             '0%': { opacity: '0', transform: 'translateY(20px)' },
@@ -44,11 +39,6 @@
                         fadeIn: {
                             '0%': { opacity: '0' },
                             '100%': { opacity: '1' },
-                        },
-                        // Keyframe untuk fade-out, bisa digunakan untuk transisi nanti
-                        fadeOut: {
-                            '0%': { opacity: '1' },
-                            '100%': { opacity: '0' },
                         }
                     },
                     animation: {
@@ -56,7 +46,6 @@
                         'fade-in-down': 'fadeInDown 0.6s ease-out forwards',
                         'fade-in-scale-up': 'fadeInScaleUp 0.6s ease-out forwards',
                         'fade-in': 'fadeIn 0.7s ease-out forwards',
-                        'fade-out': 'fadeOut 0.6s ease-in forwards',
                     },
                 }
             }
@@ -65,48 +54,41 @@
 </head>
 <body class="bg-paper text-ink font-sans antialiased min-h-screen flex flex-col selection:bg-accent selection:text-white">
 
-    <!-- Navigasi Sederhana - Fade in down -->
     <header class="w-full max-w-4xl mx-auto px-6 py-8 flex justify-between items-center animate-fade-in-down duration-500 delay-100">
         <div class="text-xl font-serif font-bold tracking-tight">
-            Seyraphineyap.my.id<span class="text-accent">.</span>
+            Seyraphine<span class="text-accent">.</span>
         </div>
         <nav>
-            <a href="library" class="text-sm font-medium text-gray-500 hover:text-ink transition-colors">Library</a>
+            <a href="/library.html" class="text-sm font-medium text-gray-500 hover:text-ink transition-colors">Library</a>
         </nav>
     </header>
 
-    <!-- Konten Utama (Hero Section) - Dibuat bertahap (staggered) -->
     <main class="flex-grow flex flex-col items-center justify-center px-6 py-12">
         <div class="max-w-2xl text-center space-y-8">
             
-            <!-- Elemen Dekoratif - Fade in scale up -->
             <div class="text-accent mb-4 animate-fade-in-scale-up duration-600 delay-250">
                 <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                 </svg>
             </div>
 
-            <!-- Judul Utama - Fade in up -->
             <h1 class="text-4xl md:text-6xl font-serif font-bold leading-tight text-ink animate-fade-in-up duration-600 delay-400">
                 Read story on <br>
-            <span class="italic font-normal text-gray-700">seyraphineyap</span>
+                <span class="italic font-normal text-gray-700">seyraphineyap.my.id</span>
             </h1>
             
-            <!-- Deskripsi - Fade in up -->
             <p class="text-lg md:text-xl text-gray-500 font-light max-w-lg mx-auto animate-fade-in-up duration-600 delay-550">
-                Read all of my AU for Free, Find your favorite in entirely new worlds.
+                A curated collection of my Alternate Universe stories. Find your favorite characters in entirely new worlds.
             </p>
 
-            <!-- Tombol - Fade in up -->
             <div class="pt-4 animate-fade-in-up duration-600 delay-700">
-                <a href="library" class="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-ink rounded-full hover:bg-gray-800 transition-all duration-200 shadow-sm hover:shadow-md">
+                <a href="/library.html" class="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-ink rounded-full hover:bg-gray-800 transition-all duration-200 shadow-sm hover:shadow-md">
                     Start Reading
                 </a>
             </div>
         </div>
     </main>
 
-    <!-- Footer / Credit Section - Fade in -->
     <footer class="w-full max-w-4xl mx-auto px-6 py-8 border-t border-gray-200 mt-auto text-center animate-fade-in duration-800 delay-900">
         <p class="text-sm text-gray-500">
             Created by 
