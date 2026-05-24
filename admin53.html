@@ -7,11 +7,21 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     
-    <!-- Quill.js Editor CSS -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     
     <script>
-        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Playfair Display', 'serif'] }, colors: { paper: '#faf9f6', ink: '#1c1c1c', accent: '#ea580c' } } } }
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+    </script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Playfair Display', 'serif'] }, colors: { paper: '#faf9f6', ink: '#1c1c1c', accent: '#ea580c' } } }
+        }
     </script>
     <style>
         .ql-toolbar.ql-snow { border-radius: 0.5rem 0.5rem 0 0; border-color: #d1d5db; font-family: 'Inter', sans-serif;}
@@ -25,64 +35,70 @@
             border-radius: 0.5rem; 
             margin: 1.5rem auto; 
             display: block; 
-            cursor: grab; /* Memberi tahu bahwa gambar bisa ditarik/geser */
+            cursor: grab; 
         }
         .ql-editor img:active { cursor: grabbing; }
+
+        /* Kustomisasi Quill untuk Dark Mode */
+        .dark .ql-toolbar.ql-snow, .dark .ql-container.ql-snow { border-color: #374151; }
+        .dark .ql-toolbar.ql-snow .ql-picker, .dark .ql-toolbar.ql-snow .ql-stroke { color: #d1d5db; stroke: #d1d5db; }
+        .dark .ql-toolbar.ql-snow .ql-fill { fill: #d1d5db; }
+        .dark .ql-editor { color: #f3f4f6; }
+        .dark .ql-editor.ql-blank::before { color: #9ca3af; }
     </style>
 </head>
-<body class="bg-paper text-ink font-sans min-h-screen p-8">
+<body class="bg-paper text-ink dark:bg-gray-900 dark:text-gray-100 font-sans min-h-screen p-8 transition-colors duration-300">
+
+    <button id="theme-toggle" class="fixed top-6 right-6 p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors z-50">
+        <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+        <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+    </button>
 
     <div class="max-w-4xl mx-auto">
-        <!-- Header Dashboard -->
-        <div class="flex justify-between items-end mb-8 border-b border-gray-200 pb-4">
-            <h1 class="text-3xl font-serif font-bold">Admin Dashboard</h1>
+        <div class="flex justify-between items-end mb-8 border-b border-gray-200 dark:border-gray-700 pb-4">
+            <h1 class="text-3xl font-serif font-bold text-ink dark:text-white">Admin Dashboard</h1>
             
-            <!-- Tab Menu -->
             <div class="flex space-x-4">
                 <button onclick="switchTab('post')" id="tab-post" class="text-accent font-semibold border-b-2 border-accent pb-1 transition-all">Write Story</button>
-                <button onclick="switchTab('review')" id="tab-review" class="text-gray-500 hover:text-ink font-medium pb-1 transition-all">Review Stories</button>
+                <button onclick="switchTab('review')" id="tab-review" class="text-gray-500 dark:text-gray-400 hover:text-ink dark:hover:text-white font-medium pb-1 transition-all">Review Stories</button>
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- SECTION 1: WRITE / EDIT STORY -->
-        <!-- ========================================== -->
-        <div id="post-section" class="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-            <h2 id="form-title" class="text-xl font-bold mb-6">Post a New AU Chapter</h2>
+        <div id="post-section" class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+            <h2 id="form-title" class="text-xl font-bold mb-6 text-ink dark:text-white">Post a New AU Chapter</h2>
             
             <form id="post-form" class="space-y-5">
-                <!-- Input rahasia untuk menyimpan ID cerita yang sedang di-edit -->
                 <input type="hidden" id="edit-id" value="">
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                    <input type="text" id="title" required class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-accent outline-none">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title</label>
+                    <input type="text" id="title" required class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-ink dark:text-white px-4 py-2 rounded-lg focus:ring-2 focus:ring-accent outline-none">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Slug (URL khusus, cth: chapter-1)</label>
-                    <input type="text" id="slug" required pattern="[a-z0-9-]+" class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-accent font-mono text-sm">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Slug (URL khusus, cth: chapter-1)</label>
+                    <input type="text" id="slug" required pattern="[a-z0-9-]+" class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-ink dark:text-white px-4 py-2 rounded-lg focus:ring-2 focus:ring-accent font-mono text-sm">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Synopsis</label>
-                    <textarea id="synopsis" required class="w-full border border-gray-300 px-4 py-2 rounded-lg h-24 focus:ring-2 focus:ring-accent outline-none"></textarea>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Synopsis</label>
+                    <textarea id="synopsis" required class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-ink dark:text-white px-4 py-2 rounded-lg h-24 focus:ring-2 focus:ring-accent outline-none"></textarea>
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Story Content</label>
-                    <div id="editor-container" class="bg-white"></div>
-                    <p class="text-xs text-gray-500 mt-2 font-medium">💡 Tips: Drag & Drop foto ke kotak putih. Klik dan tahan foto untuk memindahkannya.</p>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Story Content</label>
+                    <div id="editor-container" class="bg-white dark:bg-gray-800"></div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 font-medium">💡 Tips: Drag & Drop foto ke kotak putih. Klik dan tahan foto untuk memindahkannya.</p>
                 </div>
 
                 <div class="flex items-center pt-2">
-                    <input type="checkbox" id="isPaid" class="w-4 h-4 text-accent border-gray-300 rounded focus:ring-accent">
-                    <label for="isPaid" class="ml-2 text-sm text-gray-700">Set as Paid Story</label>
+                    <input type="checkbox" id="isPaid" class="w-4 h-4 text-accent bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-accent">
+                    <label for="isPaid" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Set as Paid Story</label>
                 </div>
                 
                 <div class="flex space-x-4 mt-4">
-                    <button type="submit" id="submitBtn" class="flex-1 bg-ink text-white font-medium py-3 rounded-lg hover:bg-gray-800 transition-colors">
+                    <button type="submit" id="submitBtn" class="flex-1 bg-ink dark:bg-white text-white dark:text-gray-900 font-medium py-3 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors">
                         Publish Story
                     </button>
-                    <button type="button" onclick="cancelEdit()" id="cancelBtn" class="hidden px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium">
+                    <button type="button" onclick="cancelEdit()" id="cancelBtn" class="hidden px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium">
                         Cancel Edit
                     </button>
                 </div>
@@ -91,30 +107,48 @@
             <p id="postMessage" class="mt-4 text-center text-sm hidden"></p>
         </div>
 
-        <!-- ========================================== -->
-        <!-- SECTION 2: REVIEW & MANAGE STORIES -->
-        <!-- ========================================== -->
-        <div id="review-section" class="hidden bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+        <div id="review-section" class="hidden bg-white dark:bg-gray-800 p-8 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold">Manage Published Stories</h2>
-                <button onclick="loadReviewStories()" class="text-sm bg-gray-100 px-3 py-1 rounded-md hover:bg-gray-200">↻ Refresh</button>
+                <h2 class="text-xl font-bold text-ink dark:text-white">Manage Published Stories</h2>
+                <button onclick="loadReviewStories()" class="text-sm bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-3 py-1 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600">↻ Refresh</button>
             </div>
             
             <div id="review-list" class="space-y-4">
-                <p class="text-gray-500 text-center py-8">Loading stories...</p>
+                <p class="text-gray-500 dark:text-gray-400 text-center py-8">Loading stories...</p>
             </div>
         </div>
 
     </div>
 
-    <!-- Supabase & Quill JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     
     <script>
+        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+        const themeToggleBtn = document.getElementById('theme-toggle');
+
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            themeToggleLightIcon.classList.remove('hidden');
+        } else {
+            themeToggleDarkIcon.classList.remove('hidden');
+        }
+
+        themeToggleBtn.addEventListener('click', function() {
+            themeToggleDarkIcon.classList.toggle('hidden');
+            themeToggleLightIcon.classList.toggle('hidden');
+
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+
         let supabase;
 
-        // Inisialisasi Quill Editor
         const quill = new Quill('#editor-container', {
             theme: 'snow',
             modules: {
@@ -128,23 +162,17 @@
             placeholder: 'Tulis cerita AU-mu di sini...'
         });
 
-        // 1. INIT SUPABASE
         async function initSupabase() {
             try {
                 const response = await fetch('/.netlify/functions/get-config');
                 const keys = await response.json();
                 supabase = window.supabase.createClient(keys.supabaseUrl, keys.supabaseKey);
-                
-                // Load data untuk tab review diam-diam di background
                 loadReviewStories();
             } catch (error) {
                 alert("Gagal memuat kredensial dari server.");
             }
         }
 
-        // ==========================================
-        // FITUR TAB & UI SWITCH
-        // ==========================================
         function switchTab(tabName) {
             const postSec = document.getElementById('post-section');
             const reviewSec = document.getElementById('review-section');
@@ -155,26 +183,23 @@
                 postSec.classList.remove('hidden');
                 reviewSec.classList.add('hidden');
                 tabPostBtn.classList.add('text-accent', 'border-b-2', 'border-accent');
-                tabPostBtn.classList.remove('text-gray-500');
+                tabPostBtn.classList.remove('text-gray-500', 'dark:text-gray-400');
                 tabReviewBtn.classList.remove('text-accent', 'border-b-2', 'border-accent');
-                tabReviewBtn.classList.add('text-gray-500');
+                tabReviewBtn.classList.add('text-gray-500', 'dark:text-gray-400');
             } else {
                 postSec.classList.add('hidden');
                 reviewSec.classList.remove('hidden');
                 tabReviewBtn.classList.add('text-accent', 'border-b-2', 'border-accent');
-                tabReviewBtn.classList.remove('text-gray-500');
+                tabReviewBtn.classList.remove('text-gray-500', 'dark:text-gray-400');
                 tabPostBtn.classList.remove('text-accent', 'border-b-2', 'border-accent');
-                tabPostBtn.classList.add('text-gray-500');
+                tabPostBtn.classList.add('text-gray-500', 'dark:text-gray-400');
                 loadReviewStories();
             }
         }
 
-        // ==========================================
-        // FITUR REVIEW & MANAGE CERITA
-        // ==========================================
         async function loadReviewStories() {
             const reviewList = document.getElementById('review-list');
-            reviewList.innerHTML = '<p class="text-gray-500 text-center py-8 animate-pulse">Loading stories...</p>';
+            reviewList.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-8 animate-pulse">Loading stories...</p>';
 
             const { data, error } = await supabase
                 .from('stories')
@@ -187,19 +212,19 @@
             }
 
             if (data.length === 0) {
-                reviewList.innerHTML = '<p class="text-gray-500 text-center py-8">Belum ada cerita.</p>';
+                reviewList.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-8">Belum ada cerita.</p>';
                 return;
             }
 
             reviewList.innerHTML = data.map(story => `
-                <div class="flex justify-between items-center p-4 border border-gray-200 rounded-lg hover:shadow-sm transition-shadow">
+                <div class="flex justify-between items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-sm transition-shadow">
                     <div>
-                        <h3 class="font-bold font-serif text-lg">${story.title}</h3>
-                        <p class="text-sm text-gray-500">Slug: /story/${story.slug} | Views: ${story.views || 0}</p>
+                        <h3 class="font-bold font-serif text-lg text-ink dark:text-white">${story.title}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Slug: /story/${story.slug} | Views: ${story.views || 0}</p>
                     </div>
                     <div class="flex space-x-2">
-                        <button onclick="prepareEdit('${story.id}')" class="px-3 py-1 bg-blue-100 text-blue-700 rounded-md text-sm font-medium hover:bg-blue-200">Edit</button>
-                        <button onclick="deleteStory('${story.id}')" class="px-3 py-1 bg-red-100 text-red-700 rounded-md text-sm font-medium hover:bg-red-200">Delete</button>
+                        <button onclick="prepareEdit('${story.id}')" class="px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 rounded-md text-sm font-medium hover:bg-blue-200 dark:hover:bg-blue-800">Edit</button>
+                        <button onclick="deleteStory('${story.id}')" class="px-3 py-1 bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-400 rounded-md text-sm font-medium hover:bg-red-200 dark:hover:bg-red-800">Delete</button>
                     </div>
                 </div>
             `).join('');
@@ -209,22 +234,18 @@
             const { data, error } = await supabase.from('stories').select('*').eq('id', id).single();
             if (error) return alert("Gagal mengambil data cerita.");
 
-            // Pindahkan data ke Form
             document.getElementById('edit-id').value = data.id;
             document.getElementById('title').value = data.title;
             document.getElementById('slug').value = data.slug;
             document.getElementById('synopsis').value = data.synopsis;
             document.getElementById('isPaid').checked = data.is_paid;
             
-            // Masukkan HTML ke dalam editor
             quill.root.innerHTML = data.content;
 
-            // Ubah UI Form
             document.getElementById('form-title').innerText = "Edit Story";
             document.getElementById('submitBtn').innerText = "Update Story";
             document.getElementById('cancelBtn').classList.remove('hidden');
 
-            // Pindah ke tab form
             switchTab('post');
             window.scrollTo(0, 0);
         }
@@ -245,10 +266,6 @@
             else loadReviewStories();
         }
 
-
-        // ==========================================
-        // FITUR UPLOAD GAMBAR KE SUPABASE
-        // ==========================================
         async function uploadImageToSupabase(file) {
             const submitBtn = document.getElementById('submitBtn');
             const originalText = submitBtn.innerText;
@@ -266,11 +283,8 @@
                 const { data: publicUrlData } = supabase.storage.from('media').getPublicUrl(fileName);
                 
                 const range = quill.getSelection(true);
-                // 1. Masukkan Gambar
                 quill.insertEmbed(range.index, 'image', publicUrlData.publicUrl);
-                // 2. Beri "Enter" otomatis di bawah gambar agar gampang lanjut nulis
                 quill.insertText(range.index + 1, '\n');
-                // 3. Pindah kursor ke bawah gambar
                 quill.setSelection(range.index + 2); 
             }
 
@@ -300,10 +314,6 @@
             }
         });
 
-
-        // ==========================================
-        // FITUR SUBMIT (PUBLISH / UPDATE)
-        // ==========================================
         document.getElementById('post-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const submitBtn = document.getElementById('submitBtn');
@@ -323,11 +333,9 @@
 
             let error;
             if (editId) {
-                // Proses Update
                 const res = await supabase.from('stories').update(storyData).eq('id', editId);
                 error = res.error;
             } else {
-                // Proses Insert Baru
                 const res = await supabase.from('stories').insert([storyData]);
                 error = res.error;
             }
@@ -339,14 +347,13 @@
             } else {
                 msgBox.innerText = editId ? 'Story Updated Successfully!' : 'Story Published Successfully!';
                 msgBox.className = 'mt-4 text-center text-sm text-green-500 font-medium';
-                cancelEdit(); // Reset form
-                loadReviewStories(); // Refresh list cerita di background
+                cancelEdit(); 
+                loadReviewStories(); 
             }
             
             submitBtn.disabled = false;
         });
 
-        // Jalankan saat pertama kali buka web
         initSupabase();
     </script>
 </body>
