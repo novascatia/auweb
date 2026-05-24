@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seyraphine - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Playfair Display', 'serif'] }, colors: { paper: '#faf9f6', ink: '#1c1c1c', accent: '#ea580c' } } } }
+    </script>
+</head>
+<body class="bg-paper text-ink font-sans min-h-screen p-8">
+
+    <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+        <div class="flex justify-between items-center mb-8 border-b border-gray-100 pb-4">
+            <h1 class="text-3xl font-serif font-bold">Admin Dashboard</h1>
+            <!-- Tombol Logout sederhana -->
+            <button id="logoutBtn" class="text-sm font-medium text-red-500 hover:text-red-700 transition-colors">
+                Log Out
+            </button>
+        </div>
+        
+        <h2 class="text-xl font-bold mb-6">Post a New AU Chapter</h2>
+        
+        <form id="post-form" class="space-y-5">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                <input type="text" id="title" required class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Slug (URL khusus, cth: chapter-1)</label>
+                <input type="text" id="slug" required pattern="[a-z0-9-]+" class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent font-mono text-sm">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Synopsis</label>
+                <textarea id="synopsis" required class="w-full border border-gray-300 px-4 py-2 rounded-lg h-24 focus:outline-none focus:ring-2 focus:ring-accent"></textarea>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Story Content</label>
+                <textarea id="content" required class="w-full border border-gray-300 px-4 py-2 rounded-lg h-64 focus:outline-none focus:ring-2 focus:ring-accent font-serif"></textarea>
+            </div>
+            <div class="flex items-center">
+                <input type="checkbox" id="isPaid" class="w-4 h-4 text-accent border-gray-300 rounded focus:ring-accent">
+                <label for="isPaid" class="ml-2 text-sm text-gray-700">Set as Paid Story</label>
+            </div>
+            
+            <button type="submit" id="submitBtn" class="w-full bg-ink text-white font-medium py-3 rounded-lg hover:bg-gray-800 transition-colors">
+                Publish Story
+            </button>
+        </form>
+        
+        <p id="postMessage" class="mt-4 text-center text-sm hidden"></p>
+    </div>
+
+    <!-- Gunakan Supabase via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
+    <script>
+        let supabase;
+
+        async function initSupabase() {
+            try {
+                // Fetch konfigurasi dari Netlify Functions
+                const response = await fetch('/.netlify/functions/get-config');
+                if (!response.ok) throw new Error('Gagal memuat konfigurasi');
+                
+                const keys = await response.json();
+                supabase = window.supabase.createClient(keys.supabaseUrl, keys.supabaseKey);
+                
+                console.log("Supabase berhasil diinisialisasi.");
+            } catch (error) {
+                console.error("Error init:", error);
+                alert("Sistem gagal memuat data kredensial. Pastikan Netlify Function berjalan.");
+            }
+        }
+
+        document.getElementById('post-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const msgBox = document.getElementById('postMessage');
+            
+            submitBtn.innerText = 'Publishing...';
+            submitBtn.disabled = true;
+
+            const newStory = {
+                title: document.getElementById('title').value,
+                slug: document.getElementById('slug').value.toLowerCase(),
+                synopsis: document.getElementById('synopsis').value,
+                content: document.getElementById('content').value,
+                is_paid: document.getElementById('isPaid').checked
+            };
+
+            // Masukkan ke database
+            const { data, error } = await supabase.from('stories').insert([newStory]);
+
+            msgBox.classList.remove('hidden');
+            if (error) {
+                msgBox.innerText = `Error: ${error.message}`;
+                msgBox.className = 'mt-4 text-center text-sm text-red-500';
+            } else {
+                msgBox.innerText = 'Story Published Successfully!';
+                msgBox.className = 'mt-4 text-center text-sm text-green-500';
+                e.target.reset();
+            }
+            
+            submitBtn.innerText = 'Publish Story';
+            submitBtn.disabled = false;
+        });
+
+        // Jalankan init saat halaman dimuat
+        initSupabase();
+    </script>
+</body>
+</html>
