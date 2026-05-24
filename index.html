@@ -11,7 +11,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     
     <script>
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+    </script>
+
+    <script>
         tailwind.config = {
+            darkMode: 'class', // Mengaktifkan dark mode berbasis class
             theme: {
                 extend: {
                     fontFamily: {
@@ -52,10 +61,15 @@
         }
     </script>
 </head>
-<body class="bg-paper text-ink font-sans antialiased min-h-screen flex flex-col selection:bg-accent selection:text-white">
+<body class="bg-paper text-ink dark:bg-gray-900 dark:text-gray-100 font-sans antialiased min-h-screen flex flex-col selection:bg-accent selection:text-white transition-colors duration-300">
+
+    <button id="theme-toggle" class="fixed top-6 right-6 p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors z-50">
+        <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+        <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+    </button>
 
     <header class="w-full max-w-4xl mx-auto px-6 py-8 flex justify-between items-center animate-fade-in-down duration-500 delay-100">
-        <div class="text-xl font-serif font-bold tracking-tight">
+        <div class="text-xl font-serif font-bold tracking-tight text-ink dark:text-white">
             seyraphine.my.id<span class="text-accent">.</span>
         </div>
     </header>
@@ -69,31 +83,56 @@
                 </svg>
             </div>
 
-            <h1 class="text-4xl md:text-6xl font-serif font-bold leading-tight text-ink animate-fade-in-up duration-600 delay-400">
+            <h1 class="text-4xl md:text-6xl font-serif font-bold leading-tight text-ink dark:text-white animate-fade-in-up duration-600 delay-400">
                 Read story on <br>
-                <span class="italic font-normal text-gray-700">seyraphineyap</span>
+                <span class="italic font-normal text-gray-700 dark:text-gray-300">seyraphineyap</span>
             </h1>
             
-            <p class="text-lg md:text-xl text-gray-500 font-light max-w-lg mx-auto animate-fade-in-up duration-600 delay-550">
+            <p class="text-lg md:text-xl text-gray-500 dark:text-gray-400 font-light max-w-lg mx-auto animate-fade-in-up duration-600 delay-550">
                 Read AU For Free Here :]. Find your favorite characters in entirely new worlds.
             </p>
 
             <div class="pt-4 animate-fade-in-up duration-600 delay-700">
-                <a href="/library.html" class="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-ink rounded-full hover:bg-gray-800 transition-all duration-200 shadow-sm hover:shadow-md">
+                <a href="/library.html" class="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-ink dark:bg-white dark:text-ink rounded-full hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-200 shadow-sm hover:shadow-md">
                     Start Reading
                 </a>
             </div>
         </div>
     </main>
 
-    <footer class="w-full max-w-4xl mx-auto px-6 py-8 border-t border-gray-200 mt-auto text-center animate-fade-in duration-800 delay-900">
-        <p class="text-sm text-gray-500">
+    <footer class="w-full max-w-4xl mx-auto px-6 py-8 border-t border-gray-200 dark:border-gray-800 mt-auto text-center animate-fade-in duration-800 delay-900">
+        <p class="text-sm text-gray-500 dark:text-gray-400">
             Created by 
-            <a href="https://x.com/seyraphineyap" target="_blank" rel="noopener noreferrer" class="font-medium text-ink hover:text-accent transition-colors border-b border-transparent hover:border-accent pb-0.5">
+            <a href="https://x.com/seyraphineyap" target="_blank" rel="noopener noreferrer" class="font-medium text-ink dark:text-white hover:text-accent dark:hover:text-accent transition-colors border-b border-transparent hover:border-accent pb-0.5">
                 Seyraphine on X
             </a>
         </p>
     </footer>
 
+    <script>
+        // Logika Toggle Dark Mode
+        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+        const themeToggleBtn = document.getElementById('theme-toggle');
+
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            themeToggleLightIcon.classList.remove('hidden');
+        } else {
+            themeToggleDarkIcon.classList.remove('hidden');
+        }
+
+        themeToggleBtn.addEventListener('click', function() {
+            themeToggleDarkIcon.classList.toggle('hidden');
+            themeToggleLightIcon.classList.toggle('hidden');
+
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+    </script>
 </body>
 </html>
