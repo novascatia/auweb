@@ -11,6 +11,7 @@
     </script>
     <style>
         .story-content p { margin-bottom: 1.5em; line-height: 1.8; }
+        .story-content img { max-width: 100%; height: auto; border-radius: 0.5rem; margin: 2rem auto; display: block; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
     </style>
 </head>
 <body class="bg-paper text-ink font-sans min-h-screen p-8">
@@ -23,10 +24,9 @@
         <article id="story-container" class="hidden">
             <h1 id="title" class="text-4xl md:text-5xl font-serif font-bold mb-2 text-center"></h1>
             
-            <!-- Tempat menampilkan views -->
             <p id="view-count" class="text-sm text-gray-500 mb-8 text-center font-medium tracking-wide"></p>
             
-            <div id="content" class="story-content text-lg text-gray-800 whitespace-pre-wrap"></div>
+            <div id="content" class="story-content text-lg text-gray-800"></div>
         </article>
     </div>
 
@@ -34,16 +34,13 @@
     <script>
         async function loadStory() {
             try {
-                // 1. Ambil keys
                 const configRes = await fetch('/.netlify/functions/get-config');
                 const keys = await configRes.json();
                 const supabase = window.supabase.createClient(keys.supabaseUrl, keys.supabaseKey);
 
-                // 2. Ambil slug dari URL
                 const pathArray = window.location.pathname.split('/');
                 const slug = pathArray[pathArray.length - 1]; 
 
-                // 3. Tarik data cerita
                 const { data, error } = await supabase
                     .from('stories')
                     .select('*')
@@ -55,18 +52,14 @@
                 if (error || !data) {
                     document.getElementById('story-container').innerHTML = '<h1 class="text-2xl font-serif text-center mt-10">Story not found.</h1>';
                 } else {
-                    // Tampilkan data ke layar
                     document.getElementById('title').innerText = data.title;
-                    document.getElementById('content').innerText = data.content; 
+                    document.getElementById('content').innerHTML = data.content; 
                     
-                    // Hitung views baru (angka lama + 1)
                     const currentViews = data.views || 0;
                     const newViews = currentViews + 1;
                     
-                    // Tampilkan views ke layar
                     document.getElementById('view-count').innerText = `${newViews} views`;
                     
-                    // 4. Update views ke database di latar belakang
                     await supabase
                         .from('stories')
                         .update({ views: newViews })
